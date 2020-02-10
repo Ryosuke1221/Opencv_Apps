@@ -1,0 +1,1 @@
+add_library(time_string STATIC TimeString.cpp TimeString.h)
