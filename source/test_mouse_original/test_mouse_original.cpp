@@ -1,4 +1,14 @@
-#include"usingh.hpp"
+// Standard includes
+#include<stdio.h>
+#include<math.h>
+#include<string>
+#include<vector>
+#include<iostream>
+#include<fstream>
+
+//OpenCV include
+#include<opencv2/opencv.hpp>
+
 //using namespace cv;
 //using namespace std;
 
