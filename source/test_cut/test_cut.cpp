@@ -13,30 +13,11 @@
 
 int main() {
 
-	{
-		int aa;
-		cin >> aa;
-	}
-
-	//cv::Mat testimg = cv::Mat(cv::Size(960, 540), CV_8UC4, cv::Scalar(200, 100, 100));
-	//cv::imshow("test", testimg);
-	//cv::waitKey(0);
-	//cv::destroyAllWindows();
-	//cv::waitKey(0);
-
 	CTimeString time_;
 
-	//std::cout << time_.getTimeString() << endl;
-
-	//int aa;
-	//std::cin >> aa;
-
 	vector<string> filenames_;
-	//string dir_ = "\../data/cut";
-	string dir_ = "../../data/cut";
+	string dir_ = "../../data/test_cut";
 	time_.getFileNames_extension(dir_,filenames_,".png");
-
-	for (int i = 0; i < filenames_.size(); i++) cout << i << ":" << filenames_[i] << endl;
 
 	if(filenames_.size() == 0)
 	{
@@ -44,38 +25,70 @@ int main() {
 		return 0;
 	}
 
-	{
-		int aa;
-		cin >> aa;
-	}
+	cout << endl;
 
-
-	//cv::Mat::ptr p_image;
 	cv::Mat image_test = cv::imread(dir_ + "/" + filenames_[0]);
-	cv::Mat *p_image;
-	//cv::namedWindow("Image", 0);
-	cv::namedWindow("Image", 1);
-
-
-	for (int i = 0; i < filenames_.size(); i++)
-	{
-		p_image = new cv::Mat(image_test.rows, image_test.cols, CV_8UC3, cvScalar(0, 0, 0));
-		*p_image = cv::imread(dir_ + "/" + filenames_[i]);
-
-		cv::imshow("Image", *p_image);
-		cv::waitKey(1);
-
-		int aa;
-		cin >> aa;
-
-		delete p_image;
-	}
 
 	{
-		int aa;
-		cin >> aa;
-	}
+		cv::Mat *p_image_raw;
+		cv::Mat *p_image_cut;
 
+		int pos_leftup_u;
+		int pos_leftup_v;
+		int pos_rightdown_u;
+		int pos_rightdown_v;
+		int size_rows;
+		int size_cols;
+
+		//test
+		cout << "pos_leftup_u = ";
+		cin >> pos_leftup_u;
+		cout << "pos_leftup_v = ";
+		cin >> pos_leftup_v;
+		cout << "pos_rightdown_u = ";
+		cin >> pos_rightdown_u;
+		cout << "pos_rightdown_v = ";
+		cin >> pos_rightdown_v;
+
+		Sleep(1 * 1000);
+		cout << "Press Enter to Start:" << endl;
+
+		GetAsyncKeyState(VK_RETURN);
+		while (1)
+		{
+			if ((GetAsyncKeyState(VK_RETURN) & 1) == 1) break;
+			//short key_num = GetAsyncKeyState(VK_RETURN);
+			//if ((key_num & 1) == 1)	break;
+		}
+		cout << "Start!!" << endl;
+
+		size_cols = pos_rightdown_u - pos_leftup_u;
+		size_rows = pos_rightdown_v - pos_leftup_v;
+
+		for (int i = 0; i < filenames_.size(); i++)
+		{
+			p_image_raw = new cv::Mat(image_test.rows, image_test.cols, CV_8UC3, cvScalar(0, 0, 0));
+			*p_image_raw = cv::imread(dir_ + "/" + filenames_[i]);
+			p_image_cut = new cv::Mat(size_rows, size_cols, CV_8UC3, cvScalar(0, 0, 0));
+			for (int rows_ = 0; rows_ < size_rows; rows_++)
+			{
+				cv::Vec3b *src_raw = p_image_raw->ptr<cv::Vec3b>(pos_leftup_v + rows_);
+				cv::Vec3b *src_cut = p_image_cut->ptr<cv::Vec3b>(rows_);
+				for (int cols_ = 0; cols_ < size_cols; cols_++)	
+					src_cut[cols_] = src_raw[pos_leftup_u + cols_];//pointer?
+
+			}
+
+			//save image
+			//https://www.sejuku.net/blog/58892
+			string filename_new = filenames_[i].substr(0, filenames_[i].size() - 4) + "_cut.png";
+			cv::imwrite(dir_ + "/cut/" + filename_new, *p_image_cut);
+			cout << "saved:" << filename_new << endl;
+		}
+
+		delete p_image_raw;
+		delete p_image_cut;
+	}
 
 	return 0;
 }
