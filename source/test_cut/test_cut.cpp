@@ -21,7 +21,7 @@ int main() {
 
 	if(filenames_.size() == 0)
 	{
-		cout << "no file found" << endl;
+		cout << "ERROR: no file found" << endl;
 		return 0;
 	}
 
@@ -40,30 +40,80 @@ int main() {
 		int size_rows;
 		int size_cols;
 
-		//test
-		cout << "pos_leftup_u = ";
-		cin >> pos_leftup_u;
-		cout << "pos_leftup_v = ";
-		cin >> pos_leftup_v;
-		cout << "pos_rightdown_u = ";
-		cin >> pos_rightdown_u;
-		cout << "pos_rightdown_v = ";
-		cin >> pos_rightdown_v;
+		int kataoka_PC = 0;
 
-		Sleep(1 * 1000);
-		cout << "Press Enter to Start:" << endl;
+		cout << "Are you kataoka_PC in umelab? (yes:1, no:0) :";
+		cin >> kataoka_PC;
 
-		GetAsyncKeyState(VK_RETURN);
-		while (1)
+		if (kataoka_PC == 1)
 		{
-			if ((GetAsyncKeyState(VK_RETURN) & 1) == 1) break;
-			//short key_num = GetAsyncKeyState(VK_RETURN);
-			//if ((key_num & 1) == 1)	break;
+			int which_screen = 0;
+
+			cout << "Select which screen is needed (left:0, center:1, right:2) :";
+			cin >> which_screen;
+
+			if (which_screen == 0)
+			{
+				pos_leftup_u = 0;
+				pos_leftup_v = 0;
+				pos_rightdown_u = 1079;
+				pos_rightdown_v = 1919;
+			}
+			else if (which_screen == 1)
+			{
+				pos_leftup_u = 1080;
+				pos_leftup_v = 154;
+				pos_rightdown_u = 3639;
+				pos_rightdown_v = 1593;
+			}
+
+			else if (which_screen == 2)
+			{
+				pos_leftup_u = 3640;
+				pos_leftup_v = 154;
+				pos_rightdown_u = 6199;
+				pos_rightdown_v = 1593;
+			}
+			else
+			{
+				cout << "ERROR: invalid command" << endl;
+				return 0;
+			}
+
 		}
+
+		else if (kataoka_PC == 0)
+		{
+			cout << "pos_leftup_u = ";
+			cin >> pos_leftup_u;
+			cout << "pos_leftup_v = ";
+			cin >> pos_leftup_v;
+			cout << "pos_rightdown_u = ";
+			cin >> pos_rightdown_u;
+			cout << "pos_rightdown_v = ";
+			cin >> pos_rightdown_v;
+		}
+		else
+		{
+			cout << "ERROR: invalid command" << endl;
+			return 0;
+		}
+
+
+		Sleep(0.5 * 1000);
+		//cout << "Press Enter to Start:" << endl;
+
+		//GetAsyncKeyState(VK_RETURN);
+		//while (1)
+		//{
+		//	if ((GetAsyncKeyState(VK_RETURN) & 1) == 1) break;
+		//	//short key_num = GetAsyncKeyState(VK_RETURN);
+		//	//if ((key_num & 1) == 1)	break;
+		//}
 		cout << "Start!!" << endl;
 
-		size_cols = pos_rightdown_u - pos_leftup_u;
-		size_rows = pos_rightdown_v - pos_leftup_v;
+		size_cols = pos_rightdown_u - pos_leftup_u + 1;
+		size_rows = pos_rightdown_v - pos_leftup_v + 1;
 
 		for (int i = 0; i < filenames_.size(); i++)
 		{
