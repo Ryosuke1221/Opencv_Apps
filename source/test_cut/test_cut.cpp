@@ -42,10 +42,12 @@ int main() {
 
 		int kataoka_PC = 0;
 
-		cout << "Are you kataoka_PC in umelab? (yes:1, no:0) :";
+		cout << "Which are you using ? (kataoka_umelab:0, kataoka_home:1, other:2) :";
+
 		cin >> kataoka_PC;
 
-		if (kataoka_PC == 1)
+		//kataoka_umelab
+		if (kataoka_PC == 0)
 		{
 			int which_screen = 0;
 
@@ -59,6 +61,7 @@ int main() {
 				pos_rightdown_u = 1079;
 				pos_rightdown_v = 1919;
 			}
+
 			else if (which_screen == 1)
 			{
 				pos_leftup_u = 1080;
@@ -82,7 +85,38 @@ int main() {
 
 		}
 
-		else if (kataoka_PC == 0)
+		//kataoka_home
+		else if (kataoka_PC == 1)
+		{
+			int which_screen = 0;
+
+			cout << "Select which screen is needed (left:0, right:1) :";
+			cin >> which_screen;
+
+			if (which_screen == 0)
+			{
+				pos_leftup_u = 0;
+				pos_leftup_v = 0;
+				pos_rightdown_u = 1919;
+				pos_rightdown_v = 1079;
+			}
+
+			else if (which_screen == 1)
+			{
+				pos_leftup_u = 1920;
+				pos_leftup_v = 0;
+				pos_rightdown_u = 3839;
+				pos_rightdown_v = 1079;
+			}
+
+			else
+			{
+				cout << "ERROR: invalid command" << endl;
+				return 0;
+			}
+		}
+
+		else if (kataoka_PC == 2)
 		{
 			cout << "pos_leftup_u = ";
 			cin >> pos_leftup_u;
@@ -128,6 +162,7 @@ int main() {
 					src_cut[cols_] = src_raw[pos_leftup_u + cols_];//pointer?
 
 			}
+
 
 			//save image
 			//https://www.sejuku.net/blog/58892
