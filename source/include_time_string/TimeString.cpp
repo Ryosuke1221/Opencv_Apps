@@ -1,4 +1,4 @@
-#include"TimeString.h"
+﻿#include"TimeString.h"
 
 string CTimeString::getTimeString() 
 {
@@ -208,35 +208,55 @@ std::vector<int> CTimeString::find_all(const std::string str, const std::string 
 
 bool CTimeString::getFileNames(std::string folderPath, std::vector<std::string> &file_names)
 {
+	//only work in Multibyte Character Set (not in Unicode)
 	//https://qiita.com/tes2840/items/8d295b1caaf10eaf33ad
-	//#include <windows.h>
-	//#include <vector>
-	//#include <string>
-	//#include <iostream>
-	HANDLE hFind;
-	WIN32_FIND_DATA win32fd;
-	std::string search_name = folderPath + "\\*";
+	//HANDLE hFind;
+	//WIN32_FIND_DATA win32fd;
+	//std::string search_name = folderPath + "\\*";
+	//hFind = FindFirstFile(search_name.c_str(), &win32fd);
+	//if (hFind == INVALID_HANDLE_VALUE) {
+	//	throw std::runtime_error("file not found");
+	//	return false;
+	//}
+	//do
+	//{
+	//	if (win32fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+	//		cout << win32fd.cFileName << "(directory)" << endl;
+	//	}
+	//	else {
+	//		file_names.push_back(win32fd.cFileName);
+	//		//cout << file_names.back() << endl;
+	//	}
+	//} while (FindNextFile(hFind, &win32fd));
+	//FindClose(hFind);
 
-	hFind = FindFirstFile(search_name.c_str(), &win32fd);
-
-	if (hFind == INVALID_HANDLE_VALUE) {
-		throw std::runtime_error("file not found");
-		return false;
+	//work in Multibyte Character Set and Unicode
+	//https://qiita.com/takamon9/items/a9f1fccea740f2b79991
+	//https://qiita.com/episteme/items/0e3c2ee8a8c03780f01e
+	sys::path fPath(folderPath);
+	sys::directory_iterator itr(fPath), end;
+	std::error_code err;
+	file_names.clear();
+	for (itr; itr != end; itr.increment(err)) {
+		if (err != std::errc::operation_not_permitted) {
+			auto entry = *itr; // auto = std::experimental::filesystem::v1::path
+			string path_name = entry.path().generic_string();
+			//cout << "substr:dir:  = " << folderPath << endl;
+			//cout << "substr:file: = " << path_name << endl;
+			string path_relative = path_name.substr(folderPath.size() + 1, 
+				path_name.size() - folderPath.size() - 1);//startposition,size
+			//cout << "substr:path_relative = " << path_relative << endl;
+			cout << "getFileNames: ";
+			if (sys::is_directory(entry.path()))
+				cout << path_relative << "(directory)" << endl;
+			else
+			{
+				file_names.push_back(path_relative); // add to the vector.
+				cout << path_relative << endl;
+			}
+		}
+		else break;
 	}
-
-	do
-	{
-		if (win32fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-			cout << win32fd.cFileName << "(directory)" << endl;
-		}
-		else {
-			file_names.push_back(win32fd.cFileName);
-			//cout << file_names.back() << endl;
-		}
-	} while (FindNextFile(hFind, &win32fd));
-
-	FindClose(hFind);
-
 	return true;
 }
 

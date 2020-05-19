@@ -6,7 +6,15 @@
 #include<vector>
 #include<typeinfo>
 
+//20200519
+#include <locale.h>
+#include <tchar.h>
+//
+#include <filesystem>
+#include <fstream>
+
 using namespace std;
+namespace sys = std::tr2::sys;
 
 class CTimeString {
 
