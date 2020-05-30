@@ -12,12 +12,16 @@
 #include"TimeString.h"
 
 int main() {
-
-	CTimeString time_;
-
 	vector<string> filenames_;
 	string dir_ = "../../data/test_cut";
-	time_.getFileNames_extension(dir_,filenames_,".png");
+	CTimeString::getFileNames_extension(dir_,filenames_,".png");
+	{
+		//.jpg
+		vector<string> filenames_jpg;
+		CTimeString::getFileNames_extension(dir_, filenames_jpg, ".jpg");
+		for (int i = 0; i < filenames_jpg.size(); i++)
+			filenames_.push_back(filenames_jpg[i]);
+	}
 
 	if(filenames_.size() == 0)
 	{
@@ -163,10 +167,13 @@ int main() {
 
 			}
 
-
 			//save image
 			//https://www.sejuku.net/blog/58892
-			string filename_new = filenames_[i].substr(0, filenames_[i].size() - 4) + "_cut.png";
+			//string filename_new = filenames_[i].substr(0, filenames_[i].size() - 4) + "_cut.png";
+			string filename_new =
+				filenames_[i].substr(0, filenames_[i].size() - 4)
+				+ "_cut"
+				+ filenames_[i].substr(filenames_[i].size() - 4, 4);
 			cv::imwrite(dir_ + "/cut/" + filename_new, *p_image_cut);
 			cout << "saved:" << filename_new << endl;
 		}

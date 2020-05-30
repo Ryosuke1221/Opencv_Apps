@@ -14,7 +14,8 @@
 #include <fstream>
 
 using namespace std;
-namespace sys = std::tr2::sys;
+//namespace sys_ns = std::tr2::sys;	//occur error in JIROS
+namespace sys_ns = std::experimental::filesystem;
 
 class CTimeString {
 
@@ -22,6 +23,8 @@ class CTimeString {
 
 	static void getTimeValueFromString(string string_, int &i_minute, int &i_second, int &i_millisecond);
 	void getTimeValueFromString(string string_, int &i_hour, int &i_minute, int &i_second, int &i_millisecond);
+
+	string getTElapsefrom2S(string s_former, string s_latter);
 
 public:
 
@@ -37,50 +40,10 @@ public:
 
 	static string getTimeElapsefrom2Strings(string s_former, string s_latter);	//output  second
 
-	string getTElapsefrom2S(string s_former, string s_latter);
-
 	static std::vector<int> find_all(const std::string str, const std::string subStr);
 
 	template<typename T>
-	vector<vector<T>> getVecVecFromCSV(string filename_) {
-		//double,float, int
-		//https://qiita.com/hal1437/items/b6deb22a88c76eeaf90c
-		//https://docs.oracle.com/cd/E19957-01/805-7887/6j7dsdhfl/index.html
-		//https://pknight.hatenablog.com/entry/20090826/1251303641
-		CTimeString time_;
-		ifstream ifs_(filename_);
-		string str_;
-		int f_cnt = 0;
-		vector<vector<T>> all_observation_vec_vec;
-		if (ifs_.fail()) cout << "Error: file could not be read." << endl;
-		else {
-			while (getline(ifs_, str_)) {		//readed to string from file
-				vector<T> one_observation_vec;
-				vector<int> find_vec = time_.find_all(str_, ",");
-				one_observation_vec.push_back(stod(str_.substr(0, find_vec[0])));
-				int s_pos = 0;
-				while (s_pos < find_vec.size() - 1)
-				{
-					T value_;
-					if (typeid(T) == typeid(int))
-						value_ = stoi(str_.substr(find_vec[s_pos] + 1, find_vec[s_pos + 1] - (find_vec[s_pos] + 1)));
-					else if (typeid(T) == typeid(float))
-						value_ = stof(str_.substr(find_vec[s_pos] + 1, find_vec[s_pos + 1] - (find_vec[s_pos] + 1)));
-					else if (typeid(T) == typeid(double))
-						value_ = stod(str_.substr(find_vec[s_pos] + 1, find_vec[s_pos + 1] - (find_vec[s_pos] + 1)));
-					one_observation_vec.push_back(value_);
-					s_pos++;
-				}
-				one_observation_vec.push_back(stod(str_.substr(find_vec[s_pos] + 1, str_.size() - (find_vec[s_pos] + 1))));
-				all_observation_vec_vec.push_back(one_observation_vec);
-			}
-			ifs_.close();
-		}
-		return all_observation_vec_vec;
-	}
-
-	template<typename T>
-	void getCSVFromVecVec(vector<vector<T>> saved_data_vec_vec, string filename_)
+	static void getCSVFromVecVec(vector<vector<T>> saved_data_vec_vec, string filename_)
 	{
 		std::ofstream ofs_save;
 		ofs_save.open(filename_, std::ios::out);
@@ -97,9 +60,18 @@ public:
 
 	}
 
-	bool getFileNames(std::string folderPath, std::vector<std::string> &file_names);
-	bool getFileNames_extension(std::string folderPath, std::vector<std::string> &file_names,string s_extension);
+	static bool getFileNames(std::string folderPath, std::vector<std::string> &file_names, bool b_cout = true, bool b_getDir = false, bool b_check = true);
+	static bool getFileNames_extension(std::string folderPath, std::vector<std::string> &file_names,string s_extension);
 
 	static int getTimeElapsefrom2Strings_millisec(string s_former, string s_latter);	//output  second
+
+	static vector<vector<string>> getVecVecFromCSV_string(string filename_, string key_token = ",");
+	static vector<vector<double>> getVecVecFromCSV(string filename_);
+	
+
+private:
+	static bool getDirectoryExistance(string foder_Path);
+	static bool getDirectoryExistance_detail(string foder_Path, bool b_first);
+
 
 };
