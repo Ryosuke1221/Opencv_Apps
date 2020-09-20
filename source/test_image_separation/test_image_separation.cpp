@@ -75,10 +75,8 @@ void setImage(cv::Mat &image_, string s_filename, string s_name_window, int cols
 	cv::resizeWindow(s_name_window, cols_, rows_);
 }
 
-int main()
+bool doTask_once(string dir_)
 {
-	string dir_ = "../../data/test_image_separation";
-
 	const int cols_standard = 960;
 	const int rows_standard = 540;
 	const float aspect_ratio_standard = (float)cols_standard / (float)rows_standard;
@@ -89,7 +87,7 @@ int main()
 	{
 		vector<string> filenames_folder_temp;
 		CTimeString::getFileNames_folder(dir_, filenames_folder_temp);
-		
+
 		//check folder number
 		if (filenames_folder_temp.size() > 10)
 		{
@@ -102,7 +100,7 @@ int main()
 			throw std::runtime_error("ERROR: too few folders readed");
 		}
 
-		
+
 		//input filenames_folder
 		bool b_originFound = false;
 		string s_temp;
@@ -142,7 +140,7 @@ int main()
 		if (filenames_img.size() == 0)
 		{
 			cout << "ERROR: no image file found" << endl;
-			return 0;
+			return false;
 		}
 		cout << endl;
 	}
@@ -182,7 +180,12 @@ int main()
 						cv::FONT_HERSHEY_SIMPLEX, 5., cv::Scalar(255, 0, 0), 10);
 				if (key_ != EN_0)
 				{
+
 					string folder_move = filenames_folder[(int)key_];
+					//double check
+					//CTimeString::movefile(
+					//	dir_ + "/" + folder_origin + "/" + filenames_img[index_img],
+					//	dir_ + "/" + folder_move + "/" + filenames_img[index_img]);
 					CTimeString::movefile(
 						dir_ + "/" + folder_origin + "/" + filenames_img[index_img],
 						dir_ + "/" + folder_move + "/" + filenames_img[index_img]);
@@ -207,14 +210,14 @@ int main()
 				cout << endl;
 			}
 			//input image
-			setImage(image_showing, dir_ + "/" + folder_origin + "/" + filenames_img[index_img], 
+			setImage(image_showing, dir_ + "/" + folder_origin + "/" + filenames_img[index_img],
 				s_name_window_showing, cols_standard, rows_standard, filenames_img[index_img]);
 			cout << "showing:" << filenames_img[index_img] << endl;
 			//read: before
-			if(index_img + 1 < filenames_img.size())
+			if (index_img + 1 < filenames_img.size())
 				setImage(image_before, dir_ + "/" + folder_origin + "/" + filenames_img[index_img + 1],
 					s_name_window_before, (int)(cols_standard * 0.5), (int)(rows_standard * 0.5));
-			else 
+			else
 				image_before = cv::Mat(cv::Size((int)(cols_standard * 0.5), (int)(rows_standard * 0.5)), CV_8UC3, cv::Mat::AUTO_STEP);
 
 			b_first = false;
@@ -226,6 +229,26 @@ int main()
 		cv::waitKey(1);
 	}
 	cout << "finished" << endl;
+	cv::destroyAllWindows();
+	return true;
+}
+
+int main()
+{
+
+	string dir_ = "../../data/test_image_separation";
+
+	while (1)
+	{
+		if (!doTask_once(dir_))
+		{
+			cout << "continue?  1:Yes  0:No" << endl;
+			cout << "->";
+			bool b_continue = true;
+			cin >> b_continue;
+			if (!b_continue) break;
+		}
+	}
 
 	return 0;
 }
