@@ -145,7 +145,6 @@ bool doTask_once(string dir_)
 		cout << endl;
 	}
 
-	//cv::Mat image_test = cv::imread(dir_ + "/" + filenames_img[0]);
 	cv::Mat image_showing = cv::Mat(cv::Size(cols_standard, rows_standard), CV_8UC3, cv::Mat::AUTO_STEP);
 	cv::Mat image_before = cv::Mat(cv::Size((int)(cols_standard * 0.5), (int)(rows_standard * 0.5)), CV_8UC3, cv::Mat::AUTO_STEP);
 	cv::Mat image_after = cv::Mat(cv::Size((int)(cols_standard * 0.5), (int)(rows_standard * 0.5)), CV_8UC3, cv::Mat::AUTO_STEP);
@@ -155,7 +154,6 @@ bool doTask_once(string dir_)
 	cv::namedWindow(s_name_window_showing, cv::WINDOW_NORMAL);
 	cv::namedWindow(s_name_window_before, cv::WINDOW_NORMAL);
 	cv::namedWindow(s_name_window_after, cv::WINDOW_NORMAL);
-	//cv::Mat *p_image;
 
 	int index_img = 0;
 	bool b_first = true;
@@ -172,28 +170,23 @@ bool doTask_once(string dir_)
 				//copy: showing -> after
 				setImage(image_after, dir_ + "/" + folder_origin + "/" + filenames_img[index_img],
 					s_name_window_after, (int)(cols_standard * 0.5), (int)(rows_standard * 0.5), filenames_img[index_img]);
-				if (key_ != EN_0)
-					cv::putText(image_after, filenames_folder[(int)key_], cv::Point((int)((image_after.cols - 1)* 0.9), (int)((image_after.rows - 1)* 0.9)),
-						cv::FONT_HERSHEY_SIMPLEX, 5., cv::Scalar(255, 0, 0), 10);
-				else
+				if ((int)key_ > filenames_folder.size() || key_ == EN_0)
+				{
 					cv::putText(image_after, folder_origin, cv::Point((int)((image_after.cols - 1)* 0.9), (int)((image_after.rows - 1)* 0.9)),
 						cv::FONT_HERSHEY_SIMPLEX, 5., cv::Scalar(255, 0, 0), 10);
-				if (key_ != EN_0)
+					cout << folder_origin << " -> " << folder_origin << endl;
+				}
+				else
 				{
-
+					cv::putText(image_after, filenames_folder[(int)key_], cv::Point((int)((image_after.cols - 1)* 0.9), (int)((image_after.rows - 1)* 0.9)),
+						cv::FONT_HERSHEY_SIMPLEX, 5., cv::Scalar(255, 0, 0), 10);
 					string folder_move = filenames_folder[(int)key_];
-					//double check
-					//CTimeString::movefile(
-					//	dir_ + "/" + folder_origin + "/" + filenames_img[index_img],
-					//	dir_ + "/" + folder_move + "/" + filenames_img[index_img]);
 					CTimeString::movefile(
 						dir_ + "/" + folder_origin + "/" + filenames_img[index_img],
 						dir_ + "/" + folder_move + "/" + filenames_img[index_img]);
 					cout << folder_origin << " -> " << folder_move << endl;
 					cout << endl;
 				}
-				else
-					cout << folder_origin << " -> " << folder_origin << endl;
 				index_img++;
 				if (filenames_img.size() == index_img) break;
 			}
