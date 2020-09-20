@@ -11,7 +11,8 @@
 
 #include"TimeString.h"
 
-int main() {
+int main()
+{
 	vector<string> filenames_;
 	string dir_ = "../../data/test_cut";
 	CTimeString::getFileNames_extension(dir_,filenames_,".png");
