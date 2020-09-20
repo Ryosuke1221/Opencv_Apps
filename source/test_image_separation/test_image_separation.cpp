@@ -53,9 +53,35 @@ KEYNUM getKEYNUM()
 	return key_;
 }
 
+void setImage(cv::Mat &image_, string s_filename, string s_name_window, int cols_standard, int rows_standard, string s_txt = "")
+{
+	float aspect_ratio_standard = (float)cols_standard / (float)rows_standard;
+	//input image
+	image_.release();
+	image_ = cv::imread(s_filename);
+	//text
+	//https://swallow-incubate.com/archives/blog/20190118/
+	if(s_txt.size() != 0)
+		cv::putText(image_, s_txt, cv::Point(0, (int)((image_.rows - 1) * 0.9)),
+			cv::FONT_HERSHEY_SIMPLEX, 5., cv::Scalar(0, 255, 0), 10);
+	int cols_, rows_;
+	float ratio_size;
+	if (aspect_ratio_standard <= (float)image_.cols / (float)image_.rows)
+		ratio_size = (float)cols_standard / (float)image_.cols;
+	else
+		ratio_size = (float)rows_standard / (float)image_.rows;
+	cols_ = (int)(ratio_size * image_.cols);
+	rows_ = (int)(ratio_size * image_.rows);
+	cv::resizeWindow(s_name_window, cols_, rows_);
+}
+
 int main()
 {
 	string dir_ = "../../data/test_image_separation";
+
+	const int cols_standard = 960;
+	const int rows_standard = 540;
+	const float aspect_ratio_standard = (float)cols_standard / (float)rows_standard;
 
 	//input folder
 	string folder_origin;
@@ -79,6 +105,8 @@ int main()
 		
 		//input filenames_folder
 		bool b_originFound = false;
+		string s_temp;
+		filenames_folder.push_back(s_temp);
 		for (int j = 0; j < filenames_folder_temp.size(); j++)
 		{
 			if (filenames_folder_temp[j] == "_origin")
@@ -120,194 +148,84 @@ int main()
 	}
 
 	//cv::Mat image_test = cv::imread(dir_ + "/" + filenames_img[0]);
-	cv::Mat image_test;
-	string s_name_window = "temp";
-	cv::namedWindow(s_name_window, cv::WINDOW_NORMAL);
+	cv::Mat image_showing = cv::Mat(cv::Size(cols_standard, rows_standard), CV_8UC3, cv::Mat::AUTO_STEP);
+	cv::Mat image_before = cv::Mat(cv::Size((int)(cols_standard * 0.5), (int)(rows_standard * 0.5)), CV_8UC3, cv::Mat::AUTO_STEP);
+	cv::Mat image_after = cv::Mat(cv::Size((int)(cols_standard * 0.5), (int)(rows_standard * 0.5)), CV_8UC3, cv::Mat::AUTO_STEP);
+	string s_name_window_showing = "Showing";
+	string s_name_window_before = "Before";
+	string s_name_window_after = "After";
+	cv::namedWindow(s_name_window_showing, cv::WINDOW_NORMAL);
+	cv::namedWindow(s_name_window_before, cv::WINDOW_NORMAL);
+	cv::namedWindow(s_name_window_after, cv::WINDOW_NORMAL);
 	//cv::Mat *p_image;
 
 	int index_img = 0;
-	bool b_showing = false;
-
-	cout << "filenames_img.size():" << filenames_img.size() << endl;
-
-	const int cols_standard = 960;
-	const int rows_standard = 540;
-	const float aspect_ratio_standard = (float)cols_standard / (float)rows_standard;
-
+	bool b_first = true;
 
 	while (1)
 	{
 		KEYNUM key_ = getKEYNUM();
 
-		if ((!(key_ == EN_0 || key_ == EN_NONE) && filenames_img.size() > index_img) || !b_showing)
+		if ((key_ != EN_NONE && filenames_img.size() > index_img) || b_first)
 		{
-			image_test.release();
-			image_test = cv::imread(dir_ + "/" + folder_origin + "/" + filenames_img[index_img]);
-			int cols_, rows_;
-			float ratio_size;
-			if (aspect_ratio_standard <= (float)image_test.cols / (float)image_test.rows)
-				ratio_size = (float)cols_standard / (float)image_test.cols;
-			else
-				ratio_size = (float)rows_standard / (float)image_test.rows;
-			cols_ = (int)(ratio_size * image_test.cols);
-			rows_ = (int)(ratio_size * image_test.rows);
-			cv::resizeWindow(s_name_window, cols_, rows_);
-			index_img++;
-			b_showing = true;
+			//move image
+			if (!b_first)
+			{
+				//copy: showing -> after
+				setImage(image_after, dir_ + "/" + folder_origin + "/" + filenames_img[index_img],
+					s_name_window_after, (int)(cols_standard * 0.5), (int)(rows_standard * 0.5), filenames_img[index_img]);
+				if (key_ != EN_0)
+					cv::putText(image_after, filenames_folder[(int)key_], cv::Point((int)((image_after.cols - 1)* 0.9), (int)((image_after.rows - 1)* 0.9)),
+						cv::FONT_HERSHEY_SIMPLEX, 5., cv::Scalar(255, 0, 0), 10);
+				else
+					cv::putText(image_after, folder_origin, cv::Point((int)((image_after.cols - 1)* 0.9), (int)((image_after.rows - 1)* 0.9)),
+						cv::FONT_HERSHEY_SIMPLEX, 5., cv::Scalar(255, 0, 0), 10);
+				if (key_ != EN_0)
+				{
+					string folder_move = filenames_folder[(int)key_];
+					CTimeString::movefile(
+						dir_ + "/" + folder_origin + "/" + filenames_img[index_img],
+						dir_ + "/" + folder_move + "/" + filenames_img[index_img]);
+					cout << folder_origin << " -> " << folder_move << endl;
+					cout << endl;
+				}
+				else
+					cout << folder_origin << " -> " << folder_origin << endl;
+				index_img++;
+				if (filenames_img.size() == index_img) break;
+			}
+
+			if (index_img % 5 == 0)
+			{
+				cout << "show folder" << endl;
+				cout << "key:" << 0 << " " << folder_origin << endl;
+				for (int j = 0; j < filenames_folder.size(); j++)
+				{
+					if (j == 0) continue;
+					cout << "key:" << j << " " << filenames_folder[j] << endl;
+				}
+				cout << endl;
+			}
+			//input image
+			setImage(image_showing, dir_ + "/" + folder_origin + "/" + filenames_img[index_img], 
+				s_name_window_showing, cols_standard, rows_standard, filenames_img[index_img]);
+			cout << "showing:" << filenames_img[index_img] << endl;
+			//read: before
+			if(index_img + 1 < filenames_img.size())
+				setImage(image_before, dir_ + "/" + folder_origin + "/" + filenames_img[index_img + 1],
+					s_name_window_before, (int)(cols_standard * 0.5), (int)(rows_standard * 0.5));
+			else 
+				image_before = cv::Mat(cv::Size((int)(cols_standard * 0.5), (int)(rows_standard * 0.5)), CV_8UC3, cv::Mat::AUTO_STEP);
+
+			b_first = false;
 		}
 		if ((GetAsyncKeyState(VK_ESCAPE) & 1) == 1) break;
-		cv::imshow(s_name_window, image_test);
+		cv::imshow(s_name_window_showing, image_showing);
+		cv::imshow(s_name_window_before, image_before);
+		cv::imshow(s_name_window_after, image_after);
 		cv::waitKey(1);
 	}
-
-	//{
-	//	cv::Mat *p_image_raw;
-	//	cv::Mat *p_image_cut;
-
-	//	int pos_leftup_u;
-	//	int pos_leftup_v;
-	//	int pos_rightdown_u;
-	//	int pos_rightdown_v;
-	//	int size_rows;
-	//	int size_cols;
-
-	//	int kataoka_PC = 0;
-
-	//	cout << "Which are you using ? (kataoka_umelab:0, kataoka_home:1, other:2) :";
-
-	//	cin >> kataoka_PC;
-
-	//	//kataoka_umelab
-	//	if (kataoka_PC == 0)
-	//	{
-	//		int which_screen = 0;
-
-	//		cout << "Select which screen is needed (left:0, center:1, right:2) :";
-	//		cin >> which_screen;
-
-	//		if (which_screen == 0)
-	//		{
-	//			pos_leftup_u = 0;
-	//			pos_leftup_v = 0;
-	//			pos_rightdown_u = 1079;
-	//			pos_rightdown_v = 1919;
-	//		}
-
-	//		else if (which_screen == 1)
-	//		{
-	//			pos_leftup_u = 1080;
-	//			pos_leftup_v = 154;
-	//			pos_rightdown_u = 3639;
-	//			pos_rightdown_v = 1593;
-	//		}
-
-	//		else if (which_screen == 2)
-	//		{
-	//			pos_leftup_u = 3640;
-	//			pos_leftup_v = 154;
-	//			pos_rightdown_u = 6199;
-	//			pos_rightdown_v = 1593;
-	//		}
-	//		else
-	//		{
-	//			cout << "ERROR: invalid command" << endl;
-	//			return 0;
-	//		}
-
-	//	}
-
-	//	//kataoka_home
-	//	else if (kataoka_PC == 1)
-	//	{
-	//		int which_screen = 0;
-
-	//		cout << "Select which screen is needed (left:0, right:1) :";
-	//		cin >> which_screen;
-
-	//		if (which_screen == 0)
-	//		{
-	//			pos_leftup_u = 0;
-	//			pos_leftup_v = 0;
-	//			pos_rightdown_u = 1919;
-	//			pos_rightdown_v = 1079;
-	//		}
-
-	//		else if (which_screen == 1)
-	//		{
-	//			pos_leftup_u = 1920;
-	//			pos_leftup_v = 0;
-	//			pos_rightdown_u = 3839;
-	//			pos_rightdown_v = 1079;
-	//		}
-
-	//		else
-	//		{
-	//			cout << "ERROR: invalid command" << endl;
-	//			return 0;
-	//		}
-	//	}
-
-	//	else if (kataoka_PC == 2)
-	//	{
-	//		cout << "pos_leftup_u = ";
-	//		cin >> pos_leftup_u;
-	//		cout << "pos_leftup_v = ";
-	//		cin >> pos_leftup_v;
-	//		cout << "pos_rightdown_u = ";
-	//		cin >> pos_rightdown_u;
-	//		cout << "pos_rightdown_v = ";
-	//		cin >> pos_rightdown_v;
-	//	}
-	//	else
-	//	{
-	//		cout << "ERROR: invalid command" << endl;
-	//		return 0;
-	//	}
-
-
-	//	Sleep(0.5 * 1000);
-	//	//cout << "Press Enter to Start:" << endl;
-
-	//	//GetAsyncKeyState(VK_RETURN);
-	//	//while (1)
-	//	//{
-	//	//	if ((GetAsyncKeyState(VK_RETURN) & 1) == 1) break;
-	//	//	//short key_num = GetAsyncKeyState(VK_RETURN);
-	//	//	//if ((key_num & 1) == 1)	break;
-	//	//}
-	//	cout << "Start!!" << endl;
-
-	//	size_cols = pos_rightdown_u - pos_leftup_u + 1;
-	//	size_rows = pos_rightdown_v - pos_leftup_v + 1;
-
-	//	for (int i = 0; i < filenames_.size(); i++)
-	//	{
-	//		p_image_raw = new cv::Mat(image_test.rows, image_test.cols, CV_8UC3, cvScalar(0, 0, 0));
-	//		*p_image_raw = cv::imread(dir_ + "/" + filenames_[i]);
-	//		p_image_cut = new cv::Mat(size_rows, size_cols, CV_8UC3, cvScalar(0, 0, 0));
-	//		for (int rows_ = 0; rows_ < size_rows; rows_++)
-	//		{
-	//			cv::Vec3b *src_raw = p_image_raw->ptr<cv::Vec3b>(pos_leftup_v + rows_);
-	//			cv::Vec3b *src_cut = p_image_cut->ptr<cv::Vec3b>(rows_);
-	//			for (int cols_ = 0; cols_ < size_cols; cols_++)	
-	//				src_cut[cols_] = src_raw[pos_leftup_u + cols_];//pointer?
-
-	//		}
-
-	//		//save image
-	//		//https://www.sejuku.net/blog/58892
-	//		//string filename_new = filenames_[i].substr(0, filenames_[i].size() - 4) + "_cut.png";
-	//		string filename_new =
-	//			filenames_[i].substr(0, filenames_[i].size() - 4)
-	//			+ "_cut"
-	//			+ filenames_[i].substr(filenames_[i].size() - 4, 4);
-	//		cv::imwrite(dir_ + "/cut/" + filename_new, *p_image_cut);
-	//		cout << "saved:" << filename_new << endl;
-	//	}
-
-	//	delete p_image_raw;
-	//	delete p_image_cut;
-	//}
+	cout << "finished" << endl;
 
 	return 0;
 }
