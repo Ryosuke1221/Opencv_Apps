@@ -140,8 +140,10 @@ bool doTask_once(string dir_)
 			//.jpg
 			vector<string> filenames_jpg;
 			CTimeString::getFileNames_extension(dir_ + "/" + folder_origin, filenames_jpg, ".jpg");
-			for (int i = 0; i < filenames_jpg.size(); i++)
-				filenames_img.push_back(filenames_jpg[i]);
+			filenames_img.insert(filenames_img.end(), filenames_jpg.begin(), filenames_jpg.end());
+			vector<string> filenames_sort;
+			filenames_sort = CTimeString::sortStringVector(filenames_img);
+			filenames_img = filenames_sort;
 		}
 		if (filenames_img.size() == 0)
 		{
