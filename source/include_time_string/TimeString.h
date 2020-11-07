@@ -524,7 +524,7 @@ public:
 	}
 
 	template<typename T>
-	static vector<int> getOuolierRemovedIndex(const vector<T> &value_vec_arg, float th_rate_BigAndSmall, 
+	static vector<int> getOutlierRemovedIndex(const vector<T> &value_vec_arg, float th_rate_BigAndSmall, 
 		float &output_edge_low, float &output_edge_high)
 	{
 		vector<vector<float>> value_vecvec;
@@ -582,6 +582,14 @@ public:
 
 	static string getFilename_onlyExtension(string s_filename);
 	static string getFilename_removingFolder(string s_input);
+
+	static bool isClusterContainedAnother(const vector<int> &cluster_big, const vector<int> &cluster_small, int num_priority = 0);
+	static void removeContainedCluster(vector<vector<int>> &cluster_vecvec, int num_priority);
+	static vector<vector<int>> getIntCluster_boolMatrix_divide(const vector<vector<bool>> &b_matrix,
+		const vector<int> &header_vec_arg, const vector<int> &cluster_vec, int min_clusterSize,
+		int th_contained_priority, int th_headerDepth_recursive, bool &b_recursive_reference);
+	static vector<vector<int>> getIntCluster_boolMatrix(const vector<vector<bool>> &b_matrix, 
+		int min_clusterSize, int th_contained_priority, int th_headerDepth_recursive, bool b_cout = false);
 
 private:
 	static bool getDirectoryExistance(string foder_Path);
