@@ -135,12 +135,44 @@ bool doTask_once(string dir_)
 	//input image
 	vector<string> filenames_img;
 	{
-		CTimeString::getFileNames_extension(dir_ + "/" + folder_origin, filenames_img, ".png");
+		//.png
 		{
-			//.jpg
-			vector<string> filenames_jpg;
-			CTimeString::getFileNames_extension(dir_ + "/" + folder_origin, filenames_jpg, ".jpg");
-			filenames_img.insert(filenames_img.end(), filenames_jpg.begin(), filenames_jpg.end());
+			vector<string> filenames_temp;
+			CTimeString::getFileNames_extension(dir_ + "/" + folder_origin, filenames_temp, ".png");
+			filenames_img.insert(filenames_img.end(), filenames_temp.begin(), filenames_temp.end());
+		}
+		//.PNG
+		{
+			vector<string> filenames_temp;
+			CTimeString::getFileNames_extension(dir_ + "/" + folder_origin, filenames_temp, ".PNG");
+			filenames_img.insert(filenames_img.end(), filenames_temp.begin(), filenames_temp.end());
+		}
+		//.jpg
+		{
+			vector<string> filenames_temp;
+			CTimeString::getFileNames_extension(dir_ + "/" + folder_origin, filenames_temp, ".jpg");
+			filenames_img.insert(filenames_img.end(), filenames_temp.begin(), filenames_temp.end());
+		}
+		//.JPG
+		{
+			vector<string> filenames_temp;
+			CTimeString::getFileNames_extension(dir_ + "/" + folder_origin, filenames_temp, ".JPG");
+			filenames_img.insert(filenames_img.end(), filenames_temp.begin(), filenames_temp.end());
+		}
+		//.jpeg
+		{
+			vector<string> filenames_temp;
+			CTimeString::getFileNames_extension(dir_ + "/" + folder_origin, filenames_temp, ".jpeg");
+			filenames_img.insert(filenames_img.end(), filenames_temp.begin(), filenames_temp.end());
+		}
+		//.JPEG
+		{
+			vector<string> filenames_temp;
+			CTimeString::getFileNames_extension(dir_ + "/" + folder_origin, filenames_temp, ".JPEG");
+			filenames_img.insert(filenames_img.end(), filenames_temp.begin(), filenames_temp.end());
+		}
+		//sort
+		{
 			vector<string> filenames_sort;
 			filenames_sort = CTimeString::sortStringVector(filenames_img);
 			filenames_img = filenames_sort;
