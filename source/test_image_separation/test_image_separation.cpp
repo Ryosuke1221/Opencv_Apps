@@ -11,6 +11,12 @@
 
 #include"TimeString.h"
 
+//test_image_separation
+//\ _origin
+//\ _01
+//\ _02
+//\ _...
+
 enum KEYNUM
 {
 	EN_0 = 0,
